@@ -2,6 +2,9 @@
 
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
+
+from routes import UserRoutes
+
 import sqlite3
 
 #from routes import UserRoutes
@@ -12,8 +15,7 @@ app = Flask(__name__)
 # restful api
 api = Api(app)
 
-
-#api.add_resource(UserRoutes, '/user/<string:username>') 
+api.add_resource(UserRoutes, '/user/<string:id>') 
 
 @app.route('/')
 def index():
