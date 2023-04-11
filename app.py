@@ -1,15 +1,15 @@
 # main
 
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_restful import Api, Resource, reqparse
 from db.database import init_db, db_session
 from db.userModel import User
 from userRoutes import UserRegister
 
-app = Flask(__name__)
+# set statuc folder for public assets
+app = Flask(__name__, static_folder='client/dist', static_url_path='/')
 # restful api
 api = Api(app)
-
 
 # init db
 @app.before_first_request
@@ -24,7 +24,8 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    return "Hello, World!"
+    # serve the client
+    return send_from_directory('client/dist', 'index.html')
 
 
 @app.route('/api/users', methods=['GET'])
