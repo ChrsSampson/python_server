@@ -8,8 +8,6 @@ dir_name = os.path.dirname(__file__)
 db_path = 'sqlite:///' + os.path.join(dir_name, 'data.db')
 
 
-print(db_path)
-
 engine = create_engine(db_path)
 db_session = scoped_session( sessionmaker(autocommit=False, autoflush=False, bind=engine) ) 
 
