@@ -5,6 +5,7 @@ from flask_restful import Api, Resource, reqparse
 from db.database import init_db, db_session
 from db.userModel import User
 from userRoutes import UserRegister
+from middleware import megan, checkSession
 
 # set statuc folder for public assets
 app = Flask(__name__, static_folder='client/dist', static_url_path='/')
@@ -16,19 +17,21 @@ api = Api(app)
 def init():
     init_db()
 
-# unmount db 
+# unmount db
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
 
 
 @app.route('/')
+@megan
 def index():
     # serve the client
     return send_from_directory('client/dist', 'index.html')
 
 
 @app.route('/api/users', methods=['GET'])
+@checkSession
 def get_user():
     if(request.method == 'GET'):
         users = User.query.all()
@@ -47,4 +50,4 @@ def create_user():
 api.add_resource(UserRegister, '/api/user/<string:id>')
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(port=3000, debug=True)
