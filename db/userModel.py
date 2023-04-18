@@ -38,8 +38,7 @@ class User(Base):
             "name": f"{self.name}",
             "email": f"{self.email}",
             "created_at": f"{self.created_at}",
-            "modified_at": f"{self.modified_at}",
-            "session": f"{self.session}"
+            "modified_at": f"{self.modified_at}"
         }
     
     #takes plain text password and compares it to the hashed password
@@ -51,7 +50,6 @@ class User(Base):
         return True
 
     def create_admin_account(self, email, password):
-        self.name = "Site Administrator"
         self.email = email
         self.password = hashpw(password.encode('utf-8'), gensalt())
         self.role = 100 # this is the highest permission level 

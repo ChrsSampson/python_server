@@ -5,7 +5,7 @@ from flask_restful import Api, Resource, reqparse
 from db.database import init_db, db_session
 from db.userModel import User
 from userRoutes import UserRegister
-from middleware import megan
+from middleware import megan, require_login
 from flask.cli import AppGroup
 import click
 
@@ -14,13 +14,16 @@ app = Flask(__name__, static_folder='client/dist', static_url_path='/')
 # restful api
 api = Api(app)
 
+# sets up command line interface for "user" commands
 user_cli_utils = AppGroup('user')
 
+# Create admin account command  - flask user create_admin <email> <password>
 @user_cli_utils.command('create_admin')
 @click.argument('email')
 @click.argument('password')
 def create_admin(email, password):
     try:
+        # server is not running so we have to make the database connection
         init_db()
         user = User(name="Site Administrator", email=email, password=password)
         user.create_admin_account( email, password)
@@ -52,6 +55,7 @@ def index():
 
 @app.route('/api/users', methods=['GET'])
 @megan
+@require_login
 def get_user():
     if(request.method == 'GET'):
         users = User.query.all()
@@ -74,10 +78,11 @@ def create_user():
 def login_handler():
     if(request.method == 'POST'):
         data = request.json
-        user = User.query()
+        user = User.query.filter_by(email=data['email']).first()
         if(user):
             if(User.check_password(user, data['password'])):
-                User.create_session()
+                User.create_session(user)
+                db_session.commit()
                 return user.to_json()
             else:
                 return {"error": "Invalid Password"}
@@ -85,10 +90,10 @@ def login_handler():
 @app.route('/api/auth/logout/:id', methods=['POST'])
 @megan
 def logout_handler():
+    return {"message": "logout handler"}
     if(request.method == 'POST'):
-        
-        user = User.query('id', data['id'])
-
+            pass
+    
 api.add_resource(UserRegister, '/api/user/<string:id>')
 
 if __name__ == "__main__":
